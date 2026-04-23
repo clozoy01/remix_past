@@ -20,8 +20,12 @@
     body {
       margin: 0;
       font-family: Georgia, "Times New Roman", serif;
-      background: var(--bg);
       color: var(--ink);
+
+      background: url('records.jpg') no-repeat center center fixed;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
     }
 
     .app {
@@ -31,7 +35,9 @@
     }
 
     .sidebar {
-      background: var(--panel);
+      background: rgba(251, 248, 242, 0.4); 
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       border-right: 1px solid var(--line);
       padding: 20px;
       overflow-y: auto;
@@ -118,11 +124,12 @@
       align-items: center;
       min-height: 0;
       flex: 1;
+      background: rgba(248, 245, 239, 0.25);
     }
 
     .canvas-shell {
       width: min(100%, 1100px);
-      background: #ddd4c6;
+      background: rgba(248, 245, 239, 0.25);
       border: 1px solid #b9ab97;
       border-radius: 18px;
       padding: 16px;
@@ -133,7 +140,7 @@
       width: 100%;
       height: auto;
       display: block;
-      background: #f8f5ef;
+      background: rgba(248, 245, 239, 0.6);
       border: 1px solid #bfb2a0;
       border-radius: 12px;
     }
@@ -176,7 +183,7 @@
       <h1>Erase</h1>
       <p class="muted">
         A program that allows a user engage in the act of silencing the archive.
-        Due to the insensitive nature, this is a photo from my personal archive
+        This is a photo from my personal archive
         of my grandfather in El Salvador in the 70's.
       </p>
 
@@ -201,12 +208,12 @@
       <div class="footer-bar">
         <strong>BACKGROUND:</strong> <br></br>
 
-        The person in the photo is my grandfather Oscar Rodriguez and is set in
+        The person in the photo is my grandfather Oscar ***** and is set in
         El Salvador in the 1970's. This is the oldest archive within my family.
         <br></br>
         <strong>TASK:</strong> <br></br>
 
-        You are the colonist and you are tasked to document your experiences. 
+        As one of General Martinez's Historians, Document your account of La Matanza 
         <br></br>
 
         <strong>REFLECTION:</strong><br></br>
@@ -235,13 +242,13 @@
     let originalImageInfo = null;
 
     const falseLabels = [
-      'Unknown Cooking Subject',
-      'Civilized Helper',
-      'Laborer Type',
+      'Violent indigenous',
+      'Non mestizaje',
+      'Dangerous Native',
       'Unknown Specimen',
       'Unknown Subject',
-      'Skillfull Servant',
-      'Working Figure'
+      'Communist Native',
+      'Dangerous Figure'
     ];
 
     const falseNotes = ['TODO: ', 'NOTES'];
@@ -257,7 +264,7 @@
             originalImage = img;
             originalImageInfo = fitImageToCanvas(img, canvas.width, canvas.height);
             drawOriginal();
-            lastActionsEl.textContent = 'Family photo loaded. Ready to misarchive.';
+            lastActionsEl.textContent = 'Ready To Document.';
         };
 
         img.onerror = () => {
@@ -293,7 +300,7 @@
     function drawOriginal() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = '#f4efe6';
+        ctx.fillStyle = 'rgba(244, 239, 230, 0.3)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         if (!originalImage || !originalImageInfo) {
