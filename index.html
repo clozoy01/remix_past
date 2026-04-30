@@ -2,7 +2,6 @@
 git deploy
 -->
 
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -30,6 +29,42 @@ git deploy
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
+    }
+     
+    .reflection-box {
+      margin-top: 12px;
+      max-width: 700px;
+    }
+
+    #reflectionInput {
+      width: 100%;
+      min-height: 90px;
+      resize: none;
+      overflow: hidden;
+      padding: 12px;
+      font: inherit;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.75);
+      color: var(--ink);
+    }
+
+    .reflection-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    #wordCount {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    #archiveMessage {
+      margin-top: 10px;
+      font-weight: bold;
+      color: var(--accent-2);
     }
 
     .app {
@@ -202,7 +237,7 @@ git deploy
 
       <div class="controls">
         <button id="applyBtn" class="primary">Apply</button>
-        <button id="resetBtn">Restore</button>
+        <button id="resetBtn">Restore</button> <br></br><br></br><br></br><br></br><br></br><br></br><br></br>
       </div>
 
       <div id="lastActions" class="code-block">Loading family photo...</div>
@@ -210,20 +245,58 @@ git deploy
 
     <main class="main">
       <div class="footer-bar">
-        <strong>BACKGROUND:</strong> <br></br>
-
+        <strong>USER CONTRACT:</strong> <br></br>
+        Given a preseleted image click on the 'Apply' button, try it MULTIPLE times a read the following sections. <br></br>
+        1) Read through the section on the bottom of the left sidebar after clicking apply. <br></br>
+        2) Read through the image interventions, one of the label changes <br></br>
+        3) click restore and then annotate. Following the instructions in the 'TASK' section <br></br>
+        
+        <br></br>
+        <strong>BACKGROUND: ***********MUST READ***********</strong> <br></br>
         The person in the photo is my grandfather, and is set in
-        El Salvador in the 1970's. This is the oldest I could find in my personal archive.
+        El Salvador in the 1970's. This is the oldest photo I could find in my personal 
+        limited archive. Not much is known about my family history - to include the 
+        disapearance of my grandmother, or the death of my uncle whom I was named after.
+        Many families, including mine, have limited or no access to family archives.
+        <br></br>
+        In 1932, it is believed that La Mantanza wiped out a significant 
+        amount of indigenous people. Soon after, The El Salvadorian government stopped 
+        recording indigenous race in the census, and archival recovering has been 
+        difficult and dangerous due to El Salvadors violent history; which includes a 12 year civil
+        war that started in 1980. A controversial estimate of indigeneity was set at 5.6 percent 
+        of El Salvadors population in 1930, but upon recent investigations the prediction is actually
+        closer to 20 percent.
+        <br></br>
+        The background image is a table showing the percentage of Indigenous population by 
+        municipio. By compiling birth, death, and municipal records, researchers were 
+        able to generate updated estimates that reveal significantly higher levels of 
+        indigeneity in El Salvador than previously estimated. The canvas beneath the image 
+        is partially translucent, symbolizing the tension between emerging data that 
+        affirms Indigenous presence and the belief many scholars and the broader public 
+        that Indigenous communities in El Salvador are nearly extinct. <br></br>
+        One thing is clear, Indigenous traditions are increasingly scarce, with only 
+        about 200–300 native Nahuat Pipil speakers, the most prominent Indigenous group in 
+        El Salvador, still able to use the language.
+
         <br></br>
         <strong>TASK:</strong> <br></br>
 
-        As one of General Martinez's Historians, Document your account of La Matanza 
+        As one of General Martinez's Historians, Document your account of La Matanza in the 'DOCUMENT' section
         <br></br>
 
-        <strong>REFLECTION:</strong><br></br>
-        TODO: Word box Last time to add to the archive on your experience 
+        <strong>DOCUMENT:</strong><br></br>
+
+        <div class="reflection-box">
+          <textarea id="reflectionInput" maxlength="1200" placeholder="*Document here then click submit*"></textarea>
+          <div class="reflection-bottom">
+            <span id="wordCount">0 / 200 words</span>
+            <button id="reflectionSubmit" class="primary">Submit</button>
+          </div>
+          <p id="archiveMessage"></p>
         </div>
-        <div class="canvas-wrap">
+      </div>
+
+      <div class="canvas-wrap">
         <div class="canvas-shell">
           <canvas id="canvas" width="1000" height="700"></canvas>
         </div>
@@ -242,6 +315,18 @@ git deploy
     const optRedact = document.getElementById('optRedact');
     const optFade = document.getElementById('optFade');
     const optNotes = document.getElementById('optNotes');
+
+    const reflectionBox = document.querySelector('.reflection-box');
+
+    const originalReflectionHTML = `
+      <textarea id="reflectionInput" maxlength="1200" placeholder="Write your reflection here..."></textarea>
+      <div class="reflection-bottom">
+        <span id="wordCount">0 / 200 words</span>
+        <button id="reflectionSubmit" class="primary">Submit</button>
+      </div>
+      <p id="archiveMessage"></p>
+    `;
+
     let originalImage = null;
     let originalImageInfo = null;
 
@@ -255,193 +340,217 @@ git deploy
       'Dangerous Figure'
     ];
 
-    const falseNotes = ['TODO: ', 'NOTES'];
+    const falseNotes = ['The indigenous revolt has been eliminated.', 
+                        'the military has done its due diligence to protect its citizens.'];
 
     const stampTexts = ['STAMP OF UNAUTHENTICITY'];
 
+    function setupReflection() {
+      const reflectionInput = document.getElementById('reflectionInput');
+      const wordCount = document.getElementById('wordCount');
+      const reflectionSubmit = document.getElementById('reflectionSubmit');
+      const archiveMessage = document.getElementById('archiveMessage');
+
+      reflectionInput.addEventListener('input', () => {
+        let words = reflectionInput.value.trim().split(/\s+/).filter(Boolean);
+
+        if (words.length > 200) {
+          reflectionInput.value = words.slice(0, 200).join(' ');
+          words = words.slice(0, 200);
+        }
+
+        wordCount.textContent = `${words.length} / 200 words`;
+
+        reflectionInput.style.height = 'auto';
+        reflectionInput.style.height = reflectionInput.scrollHeight + 'px';
+      });
+
+      reflectionSubmit.addEventListener('click', () => {
+        archiveMessage.textContent = 'Your entry was not recorded in the archive';
+
+        reflectionInput.style.display = 'none';
+        document.querySelector('.reflection-bottom').style.display = 'none';
+      });
+    }
+
+    function restoreReflectionBox() {
+      reflectionBox.innerHTML = originalReflectionHTML;
+      setupReflection();
+    }
+
     function createDemoImage() {
-        const img = new Image();
+      const img = new Image();
 
-        img.src = 'gramps.jpeg';
+      img.src = 'gramps.jpeg';
 
-        img.onload = () => {
-            originalImage = img;
-            originalImageInfo = fitImageToCanvas(img, canvas.width, canvas.height);
-            drawOriginal();
-            lastActionsEl.textContent = 'Ready To Document.';
-        };
+      img.onload = () => {
+        originalImage = img;
+        originalImageInfo = fitImageToCanvas(img, canvas.width, canvas.height);
+        drawOriginal();
+        lastActionsEl.textContent = 'Ready To Document.';
+      };
 
-        img.onerror = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#f4efe6';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#2f241d';
-            ctx.font = '32px Georgia';
-            ctx.fillText('Could not load family-photo.jpg', 120, 320);
-            ctx.font = '20px Georgia';
-            ctx.fillText('Put your image in the same folder as this HTML file.', 150, 360);
-            lastActionsEl.textContent = 'Image failed to load. Check the filename and folder.';
-        };
+      img.onerror = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f4efe6';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#2f241d';
+        ctx.font = '32px Georgia';
+        ctx.fillText('Could not load family-photo.jpg', 120, 320);
+        ctx.font = '20px Georgia';
+        ctx.fillText('Put your image in the same folder as this HTML file.', 150, 360);
+        lastActionsEl.textContent = 'Image failed to load. Check the filename and folder.';
+      };
     }
 
     function randFrom(array) {
-        return array[Math.floor(Math.random() * array.length)];
+      return array[Math.floor(Math.random() * array.length)];
     }
 
     function randInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function fitImageToCanvas(img, maxW, maxH) {
-        const scale = Math.min(maxW / img.width, maxH / img.height);
-        const drawW = img.width * scale;
-        const drawH = img.height * scale;
-        const x = (maxW - drawW) / 2;
-        const y = (maxH - drawH) / 2;
-        return { x, y, drawW, drawH };
+      const scale = Math.min(maxW / img.width, maxH / img.height);
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      const x = (maxW - drawW) / 2;
+      const y = (maxH - drawH) / 2;
+      return { x, y, drawW, drawH };
     }
 
     function drawOriginal() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = 'rgba(244, 239, 230, 0.3)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(244, 239, 230, 0.3)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        if (!originalImage || !originalImageInfo) {
-            ctx.fillStyle = '#2f241d';
-            ctx.font = '34px Georgia';
-            ctx.fillText('Loading original family photograph...', 180, 330);
-            return;
-        }
+      if (!originalImage || !originalImageInfo) {
+        ctx.fillStyle = '#2f241d';
+        ctx.font = '34px Georgia';
+        ctx.fillText('Loading original family photograph...', 180, 330);
+        return;
+      }
 
-        const { x, y, drawW, drawH } = originalImageInfo;
-        ctx.drawImage(originalImage, x, y, drawW, drawH);
+      const { x, y, drawW, drawH } = originalImageInfo;
+      ctx.drawImage(originalImage, x, y, drawW, drawH);
 
-        ctx.strokeStyle = '#bca98f';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, drawW, drawH);
+      ctx.strokeStyle = '#bca98f';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, drawW, drawH);
     }
 
     function applyArchive() {
-        if (!originalImage) {
-            alert('ERROR.');
-            return;
-        }
+      if (!originalImage) {
+        alert('ERROR.');
+        return;
+      }
 
-        drawOriginal();
+      drawOriginal();
 
-        const actions = [];
+      const actions = [];
 
-        if (optFade.checked) {
-            applyFade();
-            actions.push('Indians, as several have commented, are an invisible or ghostly presence in the country');
-        }
+      if (optFade.checked) {
+        applyFade();
+        actions.push('<strong>Blur:</strong> The disapearance of indigeneity within El Salvador due to both ethnocide and assimilation in order to survive.');
+      }
 
-        if (optLabel.checked) {
-            applyFalseLabel();
-            actions.push('Taking away subjectivity with dehumanizing label.');
-        }
+      if (optLabel.checked) {
+        applyFalseLabel();
+        actions.push('<strong>Label: </strong>indigenous people were target and were seen as dangerous due to their uprising. The government is said to have target indigeneity for this.');
+      }
 
-        if (optStamp.checked) {
-            applyStamp();
-            actions.push('Easily applied stamp. Is it Authentic?');
-        }
+      if (optStamp.checked) {
+        applyStamp();
+        actions.push('<strong>Stamp: </strong> The government cooberated in a mostly mestizo identity after the mascare of 1932. Today El Salvador is recognized as the most mestizo country in Latin America');
+      }
 
-        if (optRedact.checked) {
-            applyRedactionBars();
-            actions.push('El Salvadorean government has compiled no official statistics on race since the I930 Census');
-        }
+      if (optRedact.checked) {
+        applyRedactionBars();
+        actions.push('<strong>Redaction bars: </strong>El Salvadorean government has compiled no official statistics on race since the I930 Census');
+      }
 
-        if (optNotes.checked) {
-            applyFalseNotes();
-            actions.push('False notes to add into the archive.');
-        }
+      if (optNotes.checked) {
+        applyFalseNotes();
+        actions.push('<strong>Notes: </strong>A communist uprising emerged after indigenous people wanted the land that was taken from them by the government.');
+      }
 
-        addPaperTexture();
+      addPaperTexture();
 
-        actions.push('Great work on documenting your experience.');
 
-        lastActionsEl.textContent = actions.join('\n\n');
+      lastActionsEl.innerHTML = actions.join('<br><br>');
     }
 
     function applyFade() {
-        ctx.save();
-        ctx.fillStyle = 'rgba(245, 236, 220, 0.26)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.fillStyle = 'rgba(245, 236, 220, 0.26)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        if (originalImageInfo) {
-            const { x, y, drawW, drawH } = originalImageInfo;
-            ctx.fillStyle = 'rgba(225, 220, 210, 0.16)';
-            ctx.fillRect(x, y, drawW, drawH);
-        }
-        ctx.restore();
+      if (originalImageInfo) {
+        const { x, y, drawW, drawH } = originalImageInfo;
+        ctx.fillStyle = 'rgba(225, 220, 210, 0.16)';
+        ctx.fillRect(x, y, drawW, drawH);
+      }
+
+      ctx.restore();
     }
-
 
     function applyRedactionBars() {
-        if (!originalImageInfo) return;
+      if (!originalImageInfo) return;
 
-        const { x, y, drawW, drawH } = originalImageInfo;
+      const { x, y, drawW, drawH } = originalImageInfo;
 
-        ctx.save();
+      ctx.save();
 
+      const faceX = 265.33331298828125 + drawW * 0.45;
+      const faceY = -15 + drawH * 0.25;
+      const barWidth = drawW * 0.2;
+      const barHeight = 25;
 
-        const faceX = 265.33331298828125 + drawW * 0.45;  // move left/right
-        const faceY = -15 + drawH * 0.25;  // move up/down
-        const barWidth = drawW * 0.2;
-        const barHeight = 25;
+      ctx.fillStyle = "black";
+      ctx.fillRect(faceX, faceY, barWidth, barHeight);
 
-        ctx.fillStyle = "black";
-        ctx.fillRect(faceX, faceY, barWidth, barHeight);
-
-        ctx.restore();
+      ctx.restore();
     }
 
-    //Helper to figure out the points for the face
     canvas.addEventListener("click", (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-        console.log("X:", x, "Y:", y);
+      console.log("X:", x, "Y:", y);
     });
 
     function applyStamp() {
-        const stamp = stampTexts
-        // Random number generator
-        const number = `${randInt(100, 999)}-${randInt(10, 99)}-${randInt(1000, 9999)}`;
+      const stamp = stampTexts;
+      const number = `${randInt(100, 999)}-${randInt(10, 99)}-${randInt(1000, 9999)}`;
 
-        ctx.save();
+      ctx.save();
 
-        // center of picture
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
 
-        ctx.translate(centerX, centerY);
+      ctx.translate(centerX, centerY);
+      ctx.rotate((Math.PI / 180) * -10);
 
-        // small Roatation
-        ctx.rotate((Math.PI / 180) * -10); 
+      ctx.strokeStyle = 'rgba(130, 30, 30, 0.7)';
+      ctx.fillStyle = 'rgba(130, 30, 30, 0.12)';
+      ctx.lineWidth = 3;
 
-        //Red Box attr
-        ctx.strokeStyle = 'rgba(130, 30, 30, 0.7)';
-        ctx.fillStyle = 'rgba(130, 30, 30, 0.12)';
-        ctx.lineWidth = 3;
+      ctx.strokeRect(-120, -36, 240, 72);
+      ctx.fillRect(-120, -36, 240, 72);
 
-        // Red box
-        ctx.strokeRect(-120, -36, 240, 72);
-        ctx.fillRect(-120, -36, 240, 72);
+      ctx.font = 'bold 24px Georgia';
+      ctx.fillStyle = 'rgba(130, 30, 30, 0.78)';
+      ctx.textAlign = 'center';
 
-        //Text inside box
-        ctx.font = 'bold 24px Georgia';
-        ctx.fillStyle = 'rgba(130, 30, 30, 0.78)';
-        ctx.textAlign = 'center';
+      ctx.fillText(stamp, 0, -4);
 
-        ctx.fillText(stamp, 0, -4);
+      ctx.font = '18px Georgia';
+      ctx.fillText(number, 0, 24);
 
-        ctx.font = '18px Georgia';
-        ctx.fillText(number, 0, 24);
-
-        ctx.restore();
+      ctx.restore();
     }
 
     function applyFalseLabel() {
@@ -521,8 +630,10 @@ git deploy
     resetBtn.addEventListener('click', () => {
       drawOriginal();
       lastActionsEl.textContent = 'Restored original family photo.';
+      restoreReflectionBox();
     });
 
+    setupReflection();
     createDemoImage();
   </script>
 </body>
